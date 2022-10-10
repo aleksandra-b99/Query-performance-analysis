@@ -1,0 +1,1 @@
+db.getCollection('restaurants').createIndex({"category":1})

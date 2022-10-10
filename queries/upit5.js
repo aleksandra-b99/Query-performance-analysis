@@ -1,0 +1,26 @@
+db.getCollection('restaurants').aggregate([
+    {
+        $match:{"price_range":{$ne:NaN},"score":{$ne:NaN}}
+    },
+    {
+        $group:{"_id":{"price_range":"$price_range"},
+                        "num_of_restaurant":{$sum:1},
+                        "total_score":{$sum:"$score"},
+                        "total_ratings":{$sum:"$ratings"},
+                        "restaurants_details":{$addToSet:{
+                                            "name":"$name",
+                                            "score":"$score",
+                                            "ratings":"$ratings",
+                                            "position":"$position"}
+                                               }
+        }
+    },
+    {
+        $project:{"restaurants_details":1,"num_of_restaurant":1,
+            "average_score":{$divide:["$total_score","$num_of_restaurant"]},
+            "total_ratings":1}
+    },
+    {
+        $sort:{"average_score":-1}
+    }  
+])

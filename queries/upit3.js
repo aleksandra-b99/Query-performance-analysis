@@ -1,0 +1,27 @@
+db.getCollection('restaurants').aggregate([
+    {
+        $match:{"category":"Burgers", 
+                "ratings":{$ne:NaN},
+                "score":{$ne:NaN}
+                }
+    },
+    {
+        $group:{"_id":{"zip_code":"$zip_code"},
+                "num_of_res":{$sum:1},
+                "total_ratings":{$sum:"$ratings"},
+                "total_score":{$sum:"$score"},
+                "restaurants":{$addToSet:{
+                                    "name":"$name",
+                                    "score":"$score",
+                                    "price_range":"$price_range"}
+                }}
+    },
+    {
+        $project:{"average_score":{$divide:["$total_score","$num_of_res"]},
+        "total_ratings":1,
+        "restaurants":1}
+    },
+    {
+        $sort:{"average_score":-1}
+    }
+])

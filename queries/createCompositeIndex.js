@@ -1,0 +1,1 @@
+db.restaurants.createIndex({"ratings":1,"score":1})

@@ -1,0 +1,1 @@
+db.getCollection('restaurants').createIndex({"price_range":1})

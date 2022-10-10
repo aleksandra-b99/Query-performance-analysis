@@ -1,0 +1,30 @@
+db.getCollection('restaurants-and-restaurant-menus').aggregate([
+    {
+        $unwind:"$menu"
+    },
+    {
+        $match:{"menu.price":{$ne:NaN}}
+    },
+    {
+        $group:{"_id":{"category":"$menu.category"},
+                    "num_of_item":{$sum:1},
+                    "total_price":{$sum:"$menu.price"},
+                    "restaurants":{$addToSet:{
+                                        "name":"$name",
+                                        "score":"$score",
+                                        "price_range":"$price_range"}
+                                   }
+                }
+    },
+    {
+        $project:{"restaurants":1,"total_price":1,"num_of_item":1,
+                 "average_price_USD":{$divide:["$total_price","$num_of_item"]}}
+    },
+    {
+        $sort:{"average_price_USD":-1}
+    },
+    {
+        $limit:10
+    }
+    
+    ])
